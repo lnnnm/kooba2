@@ -36,14 +36,14 @@ EGG system original time series data without Koopman processing (normal).
 - `EGG_anomaly-0-1000.npy`
 EGG system first 0–1000 lines of artificial abnormal intervention of original time series data, abnormal value range `(-1, 1)`.
 - `Lorenz_normal.npy`
-The original time series data of the Lorenz system without Koopman processing (normal).
+Raw time series data of the Lorenz system without Koopman processing (normal).
 - `Lorenz_anomaly-0-1000.npy`
-The original time series data of the Lorenz system with artificial anomaly intervention for the first 0–1000 rows, with anomaly range of `(-1, 1)`.
+Raw time series data of the Lorenz system with artificial anomaly intervention for the first 0–1000 rows, with anomaly range of `(-1, 1)`.
 - `Rossler_normal.npy`
-The original time series data of the Rossler system without Koopman processing (normal).
+Raw time series data of the Rossler system without Koopman processing (normal).
 - `Rossler_anomaly-0-1000.npy`
-The original time series data of the Rossler system with artificial anomaly intervention for the first 0–1000 rows, with anomaly range of `(-1, 1)`.
+Raw time series data of the Rossler system with artificial anomaly intervention for the first 0–1000 rows, with anomaly range of `(-1, 1)`.
 
 ---
 
-**Run**: Execute `demo.py` to generate all analysis charts and console indicator outputs with one click. ```
+**Run**: Execute `demo.py` to generate all analysis charts and console indicator outputs in one click. Execute ' ReadME RunME Analysis Forecast.m` to generate modal diagrams.
