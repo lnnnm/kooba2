@@ -1,0 +1,56 @@
+%% ------------------ 主脚本：计算并绘制差分模态 ------------------
+clear; clc;
+
+% 设定参数
+mode1 = 3;          % 起始 mode 编号
+mode2 = 3;          % 结束 mode 编号
+
+% 1. 计算正常数据的 Koopman 模态
+disp('Running normal data KMD...');
+Psi_norm = GenerateKoopmanModes('Normal', mode1, mode1);
+
+% 2. 计算异常数据的 Koopman 模态
+disp('Running anomalous data KMD...');
+Psi_abn  = GenerateKoopmanModes('Abnormal', mode1, mode1);
+
+% 3. 求差分
+Psi_diff = Psi_norm - Psi_abn;
+
+%% 4. 只绘制 Mode #1 的三个面图在同一个 Figure 中
+[nbx, nbt, ~] = size(Psi_diff);
+time = 0:(nbt-1);
+[X, Y] = meshgrid(time, 1:nbx);
+k = 3;  % 画 Mode #1
+
+figure('Name',['Mode #' num2str(mode1)], 'NumberTitle','off', 'Position',[200 100 1200 400]);
+
+% — 子图1：Normal — 
+ax1 = subplot(1,3,1);
+surf(ax1, X, Y, real(Psi_norm(:,:,k)), 'EdgeColor','none');
+axis(ax1, 'vis3d');             
+pbaspect(ax1, [1 1 1]);         
+title(ax1, ['Normal Mode #' num2str(mode1)], 'FontSize',16);
+xlabel(ax1,'Time'); ylabel(ax1,'State Index'); zlabel(ax1,'Re(\Psi)');
+colorbar(ax1); box(ax1,'on'); grid(ax1,'on');
+
+viewVec = get(ax1, 'View');  % e.g. [-37.5 30]
+
+% — 子图2：Anomalous — 
+ax2 = subplot(1,3,2);
+surf(ax2, X, Y, real(Psi_abn(:,:,k)), 'EdgeColor','none');
+axis(ax2, 'vis3d');
+pbaspect(ax2, [1 1 1]);
+view(ax2, viewVec);           
+title(ax2, ['Anomalous Mode #' num2str(mode1)], 'FontSize',16);
+xlabel(ax2,'Time'); ylabel(ax2,'State Index'); zlabel(ax2,'Re(\Psi)');
+colorbar(ax2); box(ax2,'on'); grid(ax2,'on');
+
+% — 子图3：Difference — 
+ax3 = subplot(1,3,3);
+surf(ax3, X, Y, real(Psi_diff(:,:,k)), 'EdgeColor','none');
+axis(ax3, 'vis3d');
+pbaspect(ax3, [1 1 1]);
+view(ax3, viewVec);          
+title(ax3, ['Difference Mode #' num2str(mode1)], 'FontSize',16);
+xlabel(ax3,'Time'); ylabel(ax3,'State Index'); zlabel(ax3,'Re(\Delta\Psi)');
+colorbar(ax3); box(ax3,'on'); grid(ax3,'on');

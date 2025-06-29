@@ -1,0 +1,50 @@
+% === Step 1: 加载数据 ===
+S = load('CAFUC-abnormal3.mat');  % 请确保文件名正确
+varname = fieldnames(S);
+data = S.(varname{1});  % 自动提取变量
+
+fprintf('Data shape: [%d × %d]\n', size(data,1), size(data,2));
+
+% === Step 2: 构造快照序列 X1, X2 ===
+X1 = data(:, 1:end-1);  % [n × (m-1)]
+X2 = data(:, 2:end);    % [n × (m-1)]
+
+
+% === Step 3: DMD 分解 ===
+[U, S, V] = svd(X1, 'econ');
+k = size(U,2);               % SVD 后 U 的实际列数
+r = min(50, k);              % 不要超过 k
+Ur = U(:, 1:r);
+Sr = S(1:r, 1:r);
+Vr = V(:, 1:r);
+
+A_tilde = Ur' * X2 * Vr / Sr;
+[W, D] = eig(A_tilde);           % Koopman 特征值 λ_j
+Phi = X2 * Vr / Sr * W;          % Koopman 模态
+
+% === Step 4: 计算周期、增长率、振幅 ===
+lambda = diag(D);                % λ_j
+log_lambda = log(lambda);        % 用于周期/增长率计算
+
+period = 2 * pi ./ abs(imag(log_lambda));  % 周期（单位：天）
+growth_rate = real(log_lambda);            % 增长率（对数域实部）
+amplitude = vecnorm(real(Phi), 2, 1);      % 每个模态的振幅（L2范数）
+
+% === Step 5: 提取幅度最大 Top 10 模态 ===
+[amp_sorted, idx] = sort(amplitude, 'descend');
+top_k = 10;
+top_modes   = idx(1:top_k);
+top_period  = period(top_modes);
+top_amp     = amplitude(top_modes);
+top_growth  = growth_rate(top_modes);
+
+% === Step 6: 输出为表格 ===
+T = table(top_modes(:), top_period(:), top_amp(:), top_growth(:), ...
+    'VariableNames', {'Modes', 'Seconds', 'Amplitude', 'Growth_rate'});
+
+disp('=== Top 10 Koopman 模态稳定性特征表 ===');
+disp(T);
+
+% === 可选保存为 CSV 文件或 Excel 文件 ===
+writetable(T, 'Top10_KoopmanModes.csv');
+% writetable(T, 'Top10_KoopmanModes.xlsx');
